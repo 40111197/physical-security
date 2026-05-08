@@ -294,6 +294,9 @@ function renderContent() {
         main.innerHTML = getPlaceholderHTML({ label: filename.replace(/-/g, ' ').toUpperCase(), icon: 'box' });
     }
 
+    // Append universal footer to all pages
+    main.insertAdjacentHTML('beforeend', renderFooter());
+
     lucide.createIcons({ nodes: main.querySelectorAll('[data-lucide]') });
 }
 
@@ -652,6 +655,40 @@ function getPlaceholderHTML(item) {
     </div>`;
 }
 
+// ─── Table Toolbar Component ──────────────────────────────────────────────
+window.downloadTemplate = function(type) {
+    alert("Downloading CSV template for " + type + "...");
+};
+window.triggerImport = function(type) {
+    alert("Triggering bulk CSV import for " + type + "...");
+};
+window.exportData = function(type) {
+    alert("Exporting current " + type + " records to CSV...");
+};
+
+function getTableToolbarHTML(modalType, addLabel) {
+    return `
+    <div class="flex flex-wrap items-center justify-end gap-2 md:gap-3">
+        <div class="relative hidden lg:block mr-2">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+            <input type="text" placeholder="Search records..." class="bg-navy-900 border border-white/10 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-blue transition-colors w-48 shadow-inner">
+        </div>
+        <button onclick="downloadTemplate('${modalType}')" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold py-1.5 px-2.5 md:px-3 rounded flex items-center gap-1.5 transition-colors" title="Download Template">
+            <i data-lucide="download-cloud" style="width:14px;height:14px;"></i> <span class="hidden md:inline">Template</span>
+        </button>
+        <button onclick="triggerImport('${modalType}')" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold py-1.5 px-2.5 md:px-3 rounded flex items-center gap-1.5 transition-colors" title="Import CSV">
+            <i data-lucide="file-up" style="width:14px;height:14px;"></i> <span class="hidden md:inline">Import</span>
+        </button>
+        <button onclick="exportData('${modalType}')" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold py-1.5 px-2.5 md:px-3 rounded flex items-center gap-1.5 transition-colors" title="Export CSV">
+            <i data-lucide="file-down" style="width:14px;height:14px;"></i> <span class="hidden md:inline">Export</span>
+        </button>
+        <button onclick="openModal('${modalType}')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors shadow-lg shadow-brand-blue/20 shrink-0">
+            <i data-lucide="plus" style="width:14px;height:14px;"></i> ${addLabel}
+        </button>
+    </div>
+    `;
+}
+
 function getMovementHTML() {
     const isDS  = state.activeNav === 'day-scholars';
     const isBH  = state.activeNav === 'boys-hostel';
@@ -718,9 +755,7 @@ function getMovementHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">${title}</h2>
-            <button onclick="openModal('movement')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Log Movement
-            </button>
+            ${getTableToolbarHTML('movement', 'Log Movement')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full whitespace-nowrap">
@@ -737,9 +772,7 @@ function getVehicleHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Vehicle Log</h2>
-            <button onclick="openModal('vehicle')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Log Vehicle
-            </button>
+            ${getTableToolbarHTML('vehicle', 'Log Vehicle')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full whitespace-nowrap">
@@ -773,9 +806,7 @@ function getFoodHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Food Movement</h2>
-            <button onclick="openModal('food')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Add Entry
-            </button>
+            ${getTableToolbarHTML('food', 'Add Entry')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -804,9 +835,7 @@ function getCourierHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Parcel Details</h2>
-            <button onclick="openModal('courier')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Log Parcel
-            </button>
+            ${getTableToolbarHTML('courier', 'Log Parcel')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -834,9 +863,7 @@ function getStudentsHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Student Directory</h2>
-            <button onclick="openModal('student')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Add Student
-            </button>
+            ${getTableToolbarHTML('student', 'Add Student')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -863,9 +890,7 @@ function getDetailsHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">${isStaff ? 'Staff' : 'Admin'} Details</h2>
-            <button onclick="openModal('details')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Add Entry
-            </button>
+            ${getTableToolbarHTML('details', 'Add Entry')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -889,9 +914,7 @@ function getVendorsHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Vendor Logs</h2>
-            <button onclick="openModal('vendor')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Add Vendor
-            </button>
+            ${getTableToolbarHTML('vendor', 'Add Vendor')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -915,9 +938,7 @@ function getVisitorHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Visitor Logs</h2>
-            <button onclick="openModal('visitor')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Add Visitor
-            </button>
+            ${getTableToolbarHTML('visitor', 'Add Visitor')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -941,9 +962,7 @@ function getSecSissHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">SISS Security Incidents</h2>
-            <button onclick="openModal('incident')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Report Incident
-            </button>
+            ${getTableToolbarHTML('incident', 'Report Incident')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -967,9 +986,7 @@ function getSecStudentsHTML() {
     return `<div class="dash-card p-5 fade-up">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-bold text-slate-100">Student Violations</h2>
-            <button onclick="openModal('violation')" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded flex items-center gap-1.5 transition-colors">
-                <i data-lucide="plus" style="width:12px;height:12px;"></i> Report Violation
-            </button>
+            ${getTableToolbarHTML('violation', 'Report Violation')}
         </div>
         <div class="overflow-x-auto">
             <table class="inc-table w-full">
@@ -1034,7 +1051,7 @@ function getSettingsHTML() {
             ${contentHTML}
         </div>
     </div>
-    ${renderFooter()}`;
+    </div>`;
 }
 
 function getSettingsProfileHTML() {
